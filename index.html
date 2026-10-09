@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PassForge - Password Generator</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .time-indicator {
+            margin-top: 12px;
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding-top: 12px;
+        }
+        .time-indicator .label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        .time-indicator .time-value {
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+        .time-indicator .time-value.weak { 
+            color: #ff4444;
+        }
+        .time-indicator .time-value.fair { 
+            color: #ffaa00;
+        }
+        .time-indicator .time-value.good { 
+            color: #ffcc00;
+        }
+        .time-indicator .time-value.strong { 
+            color: #44ff44;
+        }
+        
+        .time-detail {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            opacity: 0.7;
+            margin-left: auto;
+        }
+        
+        .dictionary-warning {
+            margin-top: 8px;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            display: none;
+            font-weight: 500;
+        }
+        .dictionary-warning.show {
+            display: block;
+        }
+        .dictionary-warning.danger {
+            background: rgba(255, 68, 68, 0.12);
+            color: #ff6666;
+            border: 1px solid rgba(255, 68, 68, 0.2);
+        }
+        .dictionary-warning.warning {
+            background: rgba(255, 170, 0, 0.12);
+            color: #ffbb33;
+            border: 1px solid rgba(255, 170, 0, 0.2);
+        }
+        
+        .time-icon {
+            font-size: 1.1rem;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+            max-width: 100%;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            color: var(--text-primary);
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .checkbox-label:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            min-height: 20px;
+            cursor: pointer;
+            accent-color: #ffffff;
+            flex-shrink: 0;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .checkbox-label input[type="checkbox"]:checked {
+            background: #ffffff;
+            border-color: #ffffff;
+        }
+
+        .checkbox-label input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #000000;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .checkbox-label input[type="checkbox"]:focus {
+            outline: 2px solid rgba(255, 255, 255, 0.3);
+            outline-offset: 2px;
+        }
+
+        .checkbox-label span {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            word-break: break-word;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 480px) {
+            .checkbox-group {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            
+            .checkbox-label {
+                padding: 10px 12px;
+                font-size: 0.8rem;
+            }
+
+            .checkbox-label input[type="checkbox"] {
+                width: 22px;
+                height: 22px;
+                min-width: 22px;
+                min-height: 22px;
+            }
+
+            .checkbox-label span {
+                font-size: 0.8rem;
+            }
+
+            .time-indicator {
+                padding: 10px 0;
+                gap: 8px;
+            }
+
+            .time-indicator .time-value {
+                font-size: 0.95rem;
+            }
+
+            .card {
+                padding: 16px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .checkbox-group {
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+
+            .checkbox-label {
+                padding: 8px 10px;
+                font-size: 0.7rem;
+            }
+
+            .checkbox-label input[type="checkbox"] {
+                width: 18px;
+                height: 18px;
+                min-width: 18px;
+                min-height: 18px;
+            }
+
+            .checkbox-label span {
+                font-size: 0.7rem;
+            }
+
+            .time-indicator .time-value {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Pass<span>Forge</span></h1>
+            <h2>Password Generator</h2>
+            
+            <div class="toggle-group">
+                <button id="passwordToggle" class="toggle-btn active">Password</button>
+                <button id="pinToggle" class="toggle-btn">PIN</button>
+                <button id="passphraseToggle" class="toggle-btn">Passphrase</button>
+            </div>
+            
+            <div class="input-group" id="passwordLengthGroup">
+                <label for="passwordLength">Password Length:</label>
+                <div class="input-with-button">
+                    <input type="number" id="passwordLength" min="1" value="16" placeholder="Enter length">
+                    <button id="generateBtn" class="generate-small-btn">Generate</button>
+                </div>
+            </div>
+            
+            <div class="input-group" id="pinLengthGroup" style="display: none;">
+                <label for="pinLength">PIN Length:</label>
+                <div class="input-with-button">
+                    <input type="number" id="pinLength" min="1" value="16" placeholder="Enter length">
+                    <button id="generatePinBtn" class="generate-small-btn">Generate</button>
+                </div>
+            </div>
+            
+            <div class="input-group" id="wordCountGroup" style="display: none;">
+                <label for="wordCount">Number of Words:</label>
+                <div class="input-with-button">
+                    <input type="number" id="wordCount" min="1" value="4" placeholder="Enter word count">
+                    <button id="generatePassphraseBtn" class="generate-small-btn">Generate</button>
+                </div>
+            </div>
+            
+            <div class="checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="uppercase" checked>
+                    <span>A-Z (Uppercase)</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="lowercase" checked>
+                    <span>a-z (Lowercase)</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="numbers" checked>
+                    <span>0-9 (Numbers)</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="symbols" checked>
+                    <span>!@#$%^&* (Symbols)</span>
+                </label>
+            </div>
+            
+            <div class="output-group" id="passwordOutputGroup">
+                <label for="passwordOutput">Password:</label>
+                <div class="password-display">
+                    <input type="text" id="passwordOutput" maxlength="128">
+                    <button id="copyBtn" class="action-btn" title="Copy to clipboard">Copy</button>
+                </div>
+                <div class="strength-indicator">
+                    <div class="strength-bar">
+                        <div id="strengthBar" class="strength-fill"></div>
+                    </div>
+                    <span id="strengthText" class="strength-text"></span>
+                </div>
+                <div class="time-indicator" id="timeIndicator">
+                    <span class="time-icon">⏱</span>
+                    <span class="label">Time to crack</span>
+                    <span class="time-value" id="timeValue">—</span>
+                    <span class="time-detail">(offline attack)</span>
+                </div>
+                <div class="dictionary-warning" id="dictionaryWarning"></div>
+            </div>
+            
+            <div class="output-group" id="pinOutputGroup" style="display: none;">
+                <label for="pinOutput">PIN:</label>
+                <div class="password-display">
+                    <input type="text" id="pinOutput" maxlength="128">
+                    <button id="copyPinBtn" class="action-btn" title="Copy to clipboard">Copy</button>
+                </div>
+                <div class="strength-indicator">
+                    <div class="strength-bar">
+                        <div id="pinStrengthBar" class="strength-fill"></div>
+                    </div>
+                    <span id="pinStrengthText" class="strength-text"></span>
+                </div>
+                <div class="time-indicator" id="pinTimeIndicator">
+                    <span class="time-icon">⏱</span>
+                    <span class="label">Time to crack</span>
+                    <span class="time-value" id="pinTimeValue">—</span>
+                    <span class="time-detail">(offline attack)</span>
+                </div>
+            </div>
+            
+            <div class="output-group" id="passphraseOutputGroup" style="display: none;">
+                <label for="passphraseOutput">Access Phrase:</label>
+                <div class="password-display">
+                    <input type="text" id="passphraseOutput" readonly>
+                    <button id="copyPassphraseBtn" class="action-btn" title="Copy to clipboard">Copy</button>
+                </div>
+            </div>
+            
+            <div class="card-footer">
+                <p class="copyright">© 2026 PassForge</p>
+                <div class="card-footer-links">
+                    <a href="legal/privacy.html">Privacy</a>
+                    <a href="legal/terms.html">Terms</a>
+                </div>
+                <a href="how-to-create-secure-password.html" class="how-to-link">How to Create a Secure Password</a>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
